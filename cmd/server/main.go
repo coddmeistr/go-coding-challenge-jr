@@ -1,19 +1,23 @@
 package main
 
 import (
+	"challenge/pkg/bilty"
 	"challenge/pkg/config"
 	"challenge/pkg/grpc/challenge_server"
 	"fmt"
 	"google.golang.org/grpc"
 	"net"
+	"net/http"
 )
 
 func main() {
 	cfg := config.MustLoadByPath("./configs/server.yaml")
 
+	bil := bilty.NewBilty(cfg.BiltyOAuth.Token, http.DefaultClient)
+
 	// Start gRPC challenge_server
 	server := grpc.NewServer()
-	challenge_server.Register(server)
+	challenge_server.Register(server, bil)
 
 	done := make(chan struct{})
 	go mustRun(server, cfg.Port)

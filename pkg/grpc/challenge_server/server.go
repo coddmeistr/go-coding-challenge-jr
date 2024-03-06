@@ -9,21 +9,31 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type UrlShortener interface {
+	CreateShortLink(url string) (string, error)
+}
+
 const (
 	metadataKey = "i-am-random-key"
 )
 
 type server struct {
+	shortener UrlShortener
 	proto.UnimplementedChallengeServiceServer
 }
 
-func Register(gRPC *grpc.Server) {
-	proto.RegisterChallengeServiceServer(gRPC, &server{})
+func Register(gRPC *grpc.Server, shortener UrlShortener) {
+	proto.RegisterChallengeServiceServer(gRPC, &server{shortener: shortener})
 }
 
 func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link, error) {
 
-	return &proto.Link{}, nil
+	link, err := s.shortener.CreateShortLink(in.GetData())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Failed to get shortened link")
+	}
+
+	return &proto.Link{Data: link}, nil
 }
 
 func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_StartTimerServer) error {
