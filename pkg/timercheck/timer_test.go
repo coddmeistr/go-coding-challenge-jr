@@ -76,6 +76,7 @@ func TestTimerCheck_TestCases(t *testing.T) {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tt.wantErrMsg)
 			} else {
+				require.NoError(t, err)
 				assert.Equal(t, tt.wantRemain, remain)
 				assert.Equal(t, tt.wantElapsed, elapsed)
 			}
