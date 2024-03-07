@@ -2,7 +2,9 @@ package challenge_server
 
 import (
 	"challenge/pkg/proto"
+	"challenge/pkg/timer"
 	"context"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -18,12 +20,13 @@ const (
 )
 
 type server struct {
+	timer     *timer.Timer
 	shortener UrlShortener
 	proto.UnimplementedChallengeServiceServer
 }
 
-func Register(gRPC *grpc.Server, shortener UrlShortener) {
-	proto.RegisterChallengeServiceServer(gRPC, &server{shortener: shortener})
+func Register(gRPC *grpc.Server, shortener UrlShortener, timer *timer.Timer) {
+	proto.RegisterChallengeServiceServer(gRPC, &server{shortener: shortener, timer: timer})
 }
 
 func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link, error) {
@@ -37,6 +40,31 @@ func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link
 }
 
 func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_StartTimerServer) error {
+
+	ping, done, err := s.timer.StartOrSubscribe(timer.GetName(), int(timer.GetSeconds()), int(timer.GetFrequency()))
+	if err != nil {
+		return status.Error(codes.Internal, "Couldn't start or subscribe to timer")
+	}
+	defer func() {
+		done <- struct{}{}
+		fmt.Println("Ending streaming grpc method")
+	}()
+
+	for {
+		info, ok := <-ping
+		if !ok {
+			break
+		}
+
+		err = stream.Send(&proto.Timer{
+			Name:      info.TimerName,
+			Seconds:   int64(info.SecondsLeft),
+			Frequency: timer.Frequency,
+		})
+		if err != nil {
+			return status.Error(codes.Internal, "Failed to send streaming message")
+		}
+	}
 
 	return nil
 }
