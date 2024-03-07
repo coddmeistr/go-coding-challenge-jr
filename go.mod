@@ -1,6 +1,8 @@
 module challenge
 
-go 1.17
+go 1.22
+
+toolchain go1.22.0
 
 require (
 	google.golang.org/grpc v1.62.1
@@ -8,6 +10,7 @@ require (
 )
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
