@@ -28,7 +28,7 @@ jobs:
         run: |
           go test ./...
         env:
-          GRPC_HOST_PORT: {{$(echo $PORT)}}
+          GRPC_HOST_PORT: localhost:${{env.PORT}}
           BITLY_OAUTH_TOKEN: ${{secrets.BITLY_OAUTH_TOKEN}}
 
       - name: Registry login
