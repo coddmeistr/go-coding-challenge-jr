@@ -1,14 +1,13 @@
 FROM golang:latest
 
-WORKDIR ./
+WORKDIR /app
 
 COPY go.mod go.sum ./
-RUN go mod download
-
 COPY . ./
+RUN go mod download
 
 EXPOSE 6000
 
-RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/server -o ./server
+RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/server -o ./build
 
-CMD ["/server"]
+CMD ["./cmd/server/build"]

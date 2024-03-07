@@ -24,7 +24,12 @@ jobs:
         run: docker build -t $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) ./
 
       - name: Run docker container
-        run: docker run $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker run -e BITLY_OAUTH_TOKEN=${{secrets.BITLY_OAUTH_TOKEN}} -p 6000:6000 $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+
+      - name: Unit and integration tests
+        run: go test ./...
+        env:
+          GRPC_HOST_PORT: localhost:6000
 
       - name: Login in ghcr
         run: echo $PAT | docker login ghcr.io --username ${{ secrets.GITHUB_LOGIN }} --password ${{ secrets.GITHUB_PATH }}
