@@ -37,6 +37,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push
-        run: docker push ghcr.io/maxik12233/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
 
