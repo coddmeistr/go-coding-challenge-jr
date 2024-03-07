@@ -4,6 +4,8 @@ import (
 	"challenge/pkg/bilty"
 	"challenge/pkg/config"
 	"challenge/pkg/grpc/challenge_server"
+	"challenge/pkg/timer"
+	"challenge/pkg/timercheck"
 	"fmt"
 	"google.golang.org/grpc"
 	"net"
@@ -14,10 +16,12 @@ func main() {
 	cfg := config.MustLoadByPath("./configs/server.yaml")
 
 	bil := bilty.NewBilty(cfg.BiltyOAuth.Token, http.DefaultClient)
+	timerChecker := timercheck.NewTimerCheck(http.DefaultClient)
+	t := timer.NewTimer(*timerChecker)
 
 	// Start gRPC challenge_server
 	server := grpc.NewServer()
-	challenge_server.Register(server, bil)
+	challenge_server.Register(server, bil, t)
 
 	done := make(chan struct{})
 	go mustRun(server, cfg.Port)
