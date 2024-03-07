@@ -83,3 +83,10 @@ func TestTimerCheck_TestCases(t *testing.T) {
 		})
 	}
 }
+
+func TestTimerCheck_NotExistingTimer(t *testing.T) {
+	timercheck := NewTimerCheck(http.DefaultClient)
+	_, _, err := timercheck.CheckTimer("fgsdgsdfSDFGGDGDFGDGFGDFGDDDGG")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "not exists")
+}

@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 )
 
 var (
-	ErrInternal = errors.New("internal library error")
-	ErrTimedOut = errors.New("timer timed out")
+	ErrInternal  = errors.New("internal library error")
+	ErrTimedOut  = errors.New("timer timed out")
+	ErrNotExists = errors.New("timer not exists")
 )
 
 const (
@@ -62,7 +64,12 @@ func (t *TimerCheck) CheckTimer(name string) (remain int, elapsed int, err error
 	}
 
 	if resp.StatusCode == 504 {
-		err = fmt.Errorf("%w: %v", ErrTimedOut, "timer timed out and not exists")
+		err = fmt.Errorf("%w: %v", ErrTimedOut, "timer timed out")
+		return
+	}
+
+	if resp.StatusCode == 404 {
+		err = fmt.Errorf("%w: %v", ErrNotExists, "timer never been created")
 		return
 	}
 
@@ -71,13 +78,20 @@ func (t *TimerCheck) CheckTimer(name string) (remain int, elapsed int, err error
 		return
 	}
 
-	var timerResp TimerResponse
-	if err = json.NewDecoder(resp.Body).Decode(&timerResp); err != nil {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
 		err = fmt.Errorf("%w: %v", ErrInternal, err)
 		return
 	}
 
-	remain = timerResp.Remaining
-	elapsed = timerResp.Elapsed
+	var timerResp TimerResponse
+	err = json.Unmarshal(body, &timerResp)
+	if err != nil {
+		err = fmt.Errorf("%w: %v", ErrInternal, err)
+		return
+	}
+
+	remain = int(timerResp.Remaining)
+	elapsed = int(timerResp.Elapsed)
 	return
 }
