@@ -1,4 +1,27 @@
+## My personal comments
+
+### Environment variables:
+`BITLY_OAUTH_TOKEN` - used to have access to bitly API. Has to be set for common start and for tests in `pkg/bitly`.
+
+`GRPC_HOST_PORT` - has to be set only for integration tests in `tests` directory to specify address of running gRPC server.
+
+### Cobra CLI:
+Cobra CLI is implemented for `cmd/client` application to perform manual testing of all gRPC endpoints.
+
+General flags: `address` - gRPC address of targeted server. (default: `localhost:6000`)
+
+**Commands:**
+
+`metadata --meta=RandomMetadata` - manual call for ReadMetadata endpoint.
+
+`shortener --url=https://google.com` - manual call for MakeShortLink endpoint.
+
+`timer --name=TimerName --freq=2 --secs=10` - manual call for StartTimer endpoint.
+
+Example usage: `go run cmd/client/main.go metadata --meta=RandomString`
+
 # Go Coding Challenge - J
+
 
 ## Testing (or getting) Knowledge
 
