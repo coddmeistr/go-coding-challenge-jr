@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: "registry.gitlab.com/apps6412746/crypto-app"
+
+  IMAGE_NAME: "grpc-server-image"
+  CONTAINER_NAME: "grpc-server-container"
+  PORT: "6000"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Build container image
+        run: docker build -t $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) ./
+
+      - name: Run docker container
+        run: docker run $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+
+      - name: Login in ghcr
+        run: echo $PAT | docker login ghcr.io --username ${{ secrets.GITHUB_LOGIN }} --password ${{ secrets.GITHUB_PATH }}
+
+      - name: Tag
+        run: docker tag $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) ghcr.io/maxik12233/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7):1.0.0
+
+      - name: Push
+        run: docker push ghcr.io/maxik12233/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7):1.0.0
+
