@@ -9,6 +9,6 @@ COPY . ./
 
 EXPOSE 6000
 
-RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/server -o /server
+RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/server -o ./server
 
 CMD ["/server"]
