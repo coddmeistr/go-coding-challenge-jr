@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"log"
 )
 
 type UrlShortener interface {
@@ -41,18 +42,20 @@ func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link
 
 func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_StartTimerServer) error {
 
-	ping, done, err := s.timer.StartOrSubscribe(timer.GetName(), int(timer.GetSeconds()), int(timer.GetFrequency()))
+	ping, cancel, err := s.timer.StartOrSubscribe(timer.GetName(), int(timer.GetSeconds()), int(timer.GetFrequency()))
 	if err != nil {
+		log.Println("error when subscribing to timer: ", err)
 		return status.Error(codes.Internal, "Couldn't start or subscribe to timer")
 	}
 	defer func() {
-		done <- struct{}{}
+		cancel()
 		fmt.Println("Ending streaming grpc method")
 	}()
 
 	for {
 		info, ok := <-ping
 		if !ok {
+			log.Println("ping channel was closed")
 			break
 		}
 
