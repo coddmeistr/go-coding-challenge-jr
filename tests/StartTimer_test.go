@@ -7,6 +7,7 @@ import (
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"io"
 	"testing"
 	"time"
 )
@@ -26,7 +27,7 @@ func TestStartTimer_Ok(t *testing.T) {
 	expectedSecs := secs - freq
 	for {
 		timer, err := c.Recv()
-		if err != nil && err.Error() == "EOF" {
+		if err == io.EOF {
 			break
 		}
 		require.NoError(t, err)
@@ -68,7 +69,7 @@ func TestStartTimer_OkWithReconnect(t *testing.T) {
 	expectedSecs := secs - delay
 	for {
 		timer, err := c.Recv()
-		if err != nil && err.Error() == "EOF" {
+		if err == io.EOF {
 			break
 		}
 		require.NoError(t, err)
@@ -106,7 +107,7 @@ func TestStartTimer_OkWithDifferentClients(t *testing.T) {
 	exp1 := secs - freq1
 	for {
 		timer1, err1 := c1.Recv()
-		if err1 != nil && err1.Error() == "EOF" {
+		if err1 == io.EOF {
 			break
 		}
 		require.NoError(t, err1)
@@ -123,7 +124,7 @@ func TestStartTimer_OkWithDifferentClients(t *testing.T) {
 	exp2 := secs - freq2
 	for {
 		timer2, err2 := c2.Recv()
-		if err2 != nil && err2.Error() == "EOF" {
+		if err2 == io.EOF {
 			break
 		}
 		require.NoError(t, err2)
