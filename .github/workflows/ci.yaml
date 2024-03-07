@@ -28,7 +28,7 @@ jobs:
         run: go test ./...
         env:
           BITLY_OAUTH_TOKEN: ${{secrets.BITLY_OAUTH_TOKEN}}
-          GRPC_HOST_PORT: localhost:$(echo $PORT)
+          GRPC_HOST_PORT: localhost:$PORT
 
       - name: Registry login
         uses: docker/login-action@v1
