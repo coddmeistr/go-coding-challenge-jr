@@ -29,6 +29,7 @@ jobs:
       - name: Unit and integration tests
         run: go test ./...
         env:
+          BITLY_OAUTH_TOKEN: ${{secrets.BITLY_OAUTH_TOKEN}}
           GRPC_HOST_PORT: localhost:6000
 
       - name: Login in ghcr
