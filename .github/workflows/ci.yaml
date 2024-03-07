@@ -24,7 +24,7 @@ jobs:
         run: docker build -t $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) ./
 
       - name: Run docker container
-        run: docker run -e BITLY_OAUTH_TOKEN=${{secrets.BITLY_OAUTH_TOKEN}} -p 6000:6000 $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker run -e BITLY_OAUTH_TOKEN=${{secrets.BITLY_OAUTH_TOKEN}} -p 6000:6000 -d $(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
       - name: Unit and integration tests
         run: go test ./...
