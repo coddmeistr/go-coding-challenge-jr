@@ -53,23 +53,25 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 	}()
 
 	for {
-		info, ok := <-ping
-		if !ok {
-			log.Println("ping channel was closed")
-			break
-		}
+		select {
+		case <-stream.Context().Done():
+			return nil
+		case info, ok := <-ping:
+			if !ok {
+				log.Println("ping channel was closed")
+				return nil
+			}
 
-		err = stream.Send(&proto.Timer{
-			Name:      info.TimerName,
-			Seconds:   int64(info.SecondsLeft),
-			Frequency: timer.Frequency,
-		})
-		if err != nil {
-			return status.Error(codes.Internal, "Failed to send streaming message")
+			err = stream.Send(&proto.Timer{
+				Name:      info.TimerName,
+				Seconds:   int64(info.SecondsLeft),
+				Frequency: timer.Frequency,
+			})
+			if err != nil {
+				return status.Error(codes.Internal, "Failed to send streaming message")
+			}
 		}
 	}
-
-	return nil
 }
 
 func (s *server) ReadMetadata(ctx context.Context, in *proto.Placeholder) (*proto.Placeholder, error) {
