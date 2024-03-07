@@ -26,8 +26,7 @@ jobs:
 
       - name: Unit and integration tests
         run: |
-          GRPC_HOST_PORT=localhost:$(echo $PORT)
-          go test ./...
+          go -e GRPC_HOST_PORT=localhost:$(echo $PORT) test ./...
         env:
           BITLY_OAUTH_TOKEN: ${{secrets.BITLY_OAUTH_TOKEN}}
 
