@@ -1,6 +1,6 @@
 package timercheck
 
 type TimerResponse struct {
-	Elapsed   int `json:"seconds_elapsed"`
-	Remaining int `json:"seconds_remaining"`
+	Elapsed   float64 `json:"seconds_elapsed"`
+	Remaining float64 `json:"seconds_remaining"`
 }
