@@ -1,17 +1,25 @@
 package bilty
 
 import (
+	"challenge/pkg/config"
+	"fmt"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
-	"os"
 	"testing"
 )
 
 // Checks if provided shortened url actually leads to the same original url
 func TestBilty_CreateShortLink(t *testing.T) {
 
-	token := os.Getenv("BITLY_OAUTH_TOKEN")
+	// Load environment variables in viper from context and from file
+	viper.AutomaticEnv()
+	envPath := "../../../.env"
+	if err := config.ReadAndParseFromFile(envPath, nil); err != nil {
+		fmt.Printf(".env file was not found in %s\n", envPath)
+	}
+	token := viper.GetString("BITLY_OAUTH_TOKEN")
 	require.NotEqual(t, "", token)
 
 	// Test contains only ONE testcase, because we dont want to exceed url creation limit so fast
