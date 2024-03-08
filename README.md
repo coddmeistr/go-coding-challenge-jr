@@ -37,6 +37,12 @@ Example usage: `go run cmd/client/main.go metadata --meta=RandomString`
 - `configs` - place to store configuration files.
 - `tests` - integration tests.
 
+### Docker/CI
+
+The image is tested in Github Actions and pushed to `ghcr.io`.
+
+Image size is 17MB.
+
 # Go Coding Challenge - J
 
 
