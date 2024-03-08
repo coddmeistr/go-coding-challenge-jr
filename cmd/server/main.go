@@ -48,6 +48,7 @@ func mustRun(server *grpc.Server, port int) {
 		panic(err)
 	}
 
+	fmt.Printf("Starting gRPC server on port :%d\n", port)
 	if err := server.Serve(l); err != nil {
 		panic(err)
 	}
