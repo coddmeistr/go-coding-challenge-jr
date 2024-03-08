@@ -30,7 +30,7 @@ func Register(gRPC *grpc.Server, shortener UrlShortener, timer *timer.Timer) {
 	proto.RegisterChallengeServiceServer(gRPC, &server{shortener: shortener, timer: timer})
 }
 
-func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link, error) {
+func (s *server) MakeShortLink(_ context.Context, in *proto.Link) (*proto.Link, error) {
 
 	link, err := s.shortener.CreateShortLink(in.GetData())
 	if err != nil {
@@ -76,7 +76,7 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 	}
 }
 
-func (s *server) ReadMetadata(ctx context.Context, in *proto.Placeholder) (*proto.Placeholder, error) {
+func (s *server) ReadMetadata(ctx context.Context, _ *proto.Placeholder) (*proto.Placeholder, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Errorf(codes.DataLoss, "Failed to get metadata")
