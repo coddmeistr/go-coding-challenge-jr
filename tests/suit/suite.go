@@ -1,8 +1,10 @@
 package suits
 
 import (
+	"challenge/pkg/config"
 	"challenge/pkg/proto"
-	"os"
+	"fmt"
+	"github.com/spf13/viper"
 	"testing"
 
 	"golang.org/x/net/context"
@@ -19,7 +21,13 @@ func NewDefault(t *testing.T) (context.Context, *Suite) {
 	t.Helper()
 	t.Parallel()
 
-	grpcAddress := os.Getenv("GRPC_HOST_PORT")
+	// Load environment variables in viper from context and from file
+	viper.AutomaticEnv()
+	envPath := "../.env"
+	if err := config.ReadAndParseFromFile(envPath, nil); err != nil {
+		fmt.Printf(".env file was not found in %s\n", envPath)
+	}
+	grpcAddress := viper.GetString("GRPC_HOST_PORT")
 	if grpcAddress == "" {
 		t.Fatalf("GRPC_HOST_PORT is not set")
 	}
