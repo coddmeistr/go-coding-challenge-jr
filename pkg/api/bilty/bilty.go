@@ -1,3 +1,5 @@
+// Package bilty prodives API integration with bilty API service
+// Package have been tested with unit tests
 package bilty
 
 import (
@@ -32,6 +34,9 @@ func NewBilty(token string, client *http.Client) *Bilty {
 	}
 }
 
+// CreateShortLink creates a short link for the given long URL.
+//
+// It takes a longUrl string as a parameter and returns a shortened url string and an error.
 func (b *Bilty) CreateShortLink(longUrl string) (string, error) {
 
 	bts, err := json.Marshal(CreateLinkRequest{

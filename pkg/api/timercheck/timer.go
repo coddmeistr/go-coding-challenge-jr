@@ -1,3 +1,5 @@
+// Package timercheck provides API integration  with timercheck.io
+// Package is tested with unit tests
 package timercheck
 
 import (
@@ -29,7 +31,9 @@ func NewTimerCheck(c *http.Client) *TimerCheck {
 }
 
 // CreateTimer creates new timer using timercheck.io API
-// It created new timer using provided name and with timer seconds of provided value
+// It creates new timer using provided name and with timer seconds of provided value
+//
+// ErrInternal returned when something goes wrong with API or inside this function
 func (t *TimerCheck) CreateTimer(name string, seconds int) error {
 
 	req, err := http.NewRequest("GET", host+name+"/"+fmt.Sprintf("%d", seconds), nil)
@@ -49,6 +53,12 @@ func (t *TimerCheck) CreateTimer(name string, seconds int) error {
 	return nil
 }
 
+// CheckTimer checks timer with given name and returning elapsed and remaining seconds for this timer
+//
+// ErrInternal returned when something wrong inside this function or with timercheck.io API
+// ErrTimedOut returned when timer with provided name exists but expired
+//
+// ErrNotExists returned when timer with given name have never been exist
 func (t *TimerCheck) CheckTimer(name string) (remain int, elapsed int, err error) {
 
 	req, err := http.NewRequest("GET", host+name, nil)

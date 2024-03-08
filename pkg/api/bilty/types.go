@@ -1,5 +1,3 @@
-// Package bilty API Request/Response Types
-// Structs containing only fields which needed to perform specific task
 package bilty
 
 type CreateLinkRequest struct {
