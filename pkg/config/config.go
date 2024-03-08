@@ -6,7 +6,6 @@ import (
 )
 
 type BiltyOAuth struct {
-	Login string
 	Token string
 }
 
@@ -15,6 +14,9 @@ type ServerConfig struct {
 	BiltyOAuth BiltyOAuth
 }
 
+// MustLoadByPath load envs and marshaling config file in given path
+//
+// It panics on any error
 func MustLoadByPath(path string) *ServerConfig {
 	viper.AutomaticEnv()
 	viper.SetConfigFile(path)
@@ -31,7 +33,7 @@ func MustLoadByPath(path string) *ServerConfig {
 		panic(fmt.Errorf("unable to decode into struct, %v", err))
 	}
 
-	c.BiltyOAuth.Login = viper.GetString("BITLY_OAUTH_LOGIN")
+	_ = viper.GetString("BITLY_OAUTH_LOGIN")
 	c.BiltyOAuth.Token = viper.GetString("BITLY_OAUTH_TOKEN")
 
 	return &c

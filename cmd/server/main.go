@@ -1,32 +1,45 @@
 package main
 
 import (
-	"challenge/pkg/bilty"
+	"challenge/pkg/api/bilty"
+	"challenge/pkg/api/timercheck"
 	"challenge/pkg/config"
 	"challenge/pkg/grpc/challenge_server"
 	"challenge/pkg/timer"
-	"challenge/pkg/timercheck"
 	"fmt"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
+	// Init config
 	cfg := config.MustLoadByPath("./configs/server.yaml")
 
+	// Init and inject all dependencies
 	bil := bilty.NewBilty(cfg.BiltyOAuth.Token, http.DefaultClient)
 	timerChecker := timercheck.NewTimerCheck(http.DefaultClient)
 	t := timer.NewTimer(*timerChecker)
 
-	// Start gRPC challenge_server
+	// Create gRPC server
 	server := grpc.NewServer()
 	challenge_server.Register(server, bil, t)
 
-	done := make(chan struct{})
+	// Start gRPC server
 	go mustRun(server, cfg.Port)
 
-	<-done
+	// Gracefull shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sig := <-stop
+	fmt.Printf("Starting gracefull shutdown. Signal: %v\n", sig)
+	server.GracefulStop()
+
+	fmt.Println("Gracefully stopped")
 }
 
 func mustRun(server *grpc.Server, port int) {

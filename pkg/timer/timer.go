@@ -1,7 +1,7 @@
 package timer
 
 import (
-	"challenge/pkg/timercheck"
+	"challenge/pkg/api/timercheck"
 	"context"
 	"errors"
 	"fmt"
@@ -24,6 +24,11 @@ func NewTimer(timerChecker timercheck.TimerCheck) *Timer {
 	}
 }
 
+// StartOrSubscribe creating new streaming channel which gets timer updates with given frequency
+//
+//	Streaming was created only if there was no errors in return
+//
+// You can use context cancellation function to interrupt streaming from outside
 func (t *Timer) StartOrSubscribe(timerName string, timerSeconds int, freq int) (<-chan Ping, context.CancelFunc, error) {
 
 	_, _, err := t.timerChecker.CheckTimer(timerName)
@@ -42,9 +47,11 @@ func (t *Timer) StartOrSubscribe(timerName string, timerSeconds int, freq int) (
 	ctx, cancel := context.WithCancel(context.Background())
 	ping := make(chan Ping)
 	go func() {
-		defer close(ping)
-		defer ticker.Stop()
-		defer fmt.Println("Closing timer timer subscription goroutine")
+		defer func() {
+			close(ping)
+			ticker.Stop()
+			fmt.Println("Closing timer timer subscription goroutine")
+		}()
 
 		for {
 			select {

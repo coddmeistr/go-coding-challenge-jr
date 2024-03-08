@@ -34,6 +34,7 @@ func (s *server) MakeShortLink(ctx context.Context, in *proto.Link) (*proto.Link
 
 	link, err := s.shortener.CreateShortLink(in.GetData())
 	if err != nil {
+		log.Printf("failed to get shortened link. err: %v\n", err)
 		return nil, status.Error(codes.Internal, "Failed to get shortened link")
 	}
 
@@ -68,6 +69,7 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 				Frequency: timer.Frequency,
 			})
 			if err != nil {
+				log.Printf("failed to send message to stream. err: %v\n", err)
 				return status.Error(codes.Internal, "Failed to send streaming message")
 			}
 		}
