@@ -20,7 +20,7 @@ func main() {
 	cfg := config.MustLoadByPath("./configs/server.yaml")
 
 	// Init and inject all dependencies
-	bil := bilty.NewBilty(cfg.BiltyOAuth.Token, http.DefaultClient)
+	bil := bilty.NewBilty(cfg.BitlyOAuthToken, http.DefaultClient)
 	timerChecker := timercheck.NewTimerCheck(http.DefaultClient)
 	t := timer.NewTimer(*timerChecker)
 

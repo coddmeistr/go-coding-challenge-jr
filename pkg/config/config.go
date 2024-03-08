@@ -5,13 +5,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-type BiltyOAuth struct {
-	Token string
-}
-
 type ServerConfig struct {
-	Port       int `mapstructure:"port"`
-	BiltyOAuth BiltyOAuth
+	Port            int    `mapstructure:"port"`
+	BitlyOAuthToken string `mapstructure:"BITLY_OAUTH_TOKEN"`
 }
 
 // MustLoadByPath load envs and marshaling config file in given path
@@ -19,22 +15,30 @@ type ServerConfig struct {
 // It panics on any error
 func MustLoadByPath(path string) *ServerConfig {
 	viper.AutomaticEnv()
-	viper.SetConfigFile(path)
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
-	}
 
 	var c ServerConfig
 
-	err = viper.Unmarshal(&c)
-	if err != nil {
+	// Reading public config file
+	viper.SetConfigFile(path)
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	if err := viper.Unmarshal(&c); err != nil {
 		panic(fmt.Errorf("unable to decode into struct, %v", err))
 	}
 
-	_ = viper.GetString("BITLY_OAUTH_LOGIN")
-	c.BiltyOAuth.Token = viper.GetString("BITLY_OAUTH_TOKEN")
+	// Read .env file in root directory
+	viper.SetConfigFile("./.env")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+	if err := viper.Unmarshal(&c); err != nil {
+		panic(fmt.Errorf("unable to decode into struct, %v", err))
+	}
+
+	if c.BitlyOAuthToken == "" {
+		panic("BITLY_OAUTH_TOKEN is not set")
+	}
 
 	return &c
 }
