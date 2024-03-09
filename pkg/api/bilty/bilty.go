@@ -17,9 +17,9 @@ var (
 )
 
 const (
-	host = "https://api-ssl.bitly.com/v4"
+	host = "https://api-ssl.bitly.com"
 
-	shortenUrl = "/shorten"
+	shortenUrl = "/v4/shorten"
 )
 
 type Bilty struct {

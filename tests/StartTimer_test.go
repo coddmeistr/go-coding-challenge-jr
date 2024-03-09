@@ -15,7 +15,7 @@ import (
 func TestStartTimer_Ok(t *testing.T) {
 	_, s := suits.NewDefault(t)
 
-	timerName := gofakeit.Word()
+	timerName := gofakeit.Username()
 	var freq int64 = 3
 	var secs int64 = 14
 
@@ -45,7 +45,7 @@ func TestStartTimer_Ok(t *testing.T) {
 func TestStartTimer_OkWithReconnect(t *testing.T) {
 	_, s := suits.NewDefault(t)
 
-	timerName := gofakeit.Word()
+	timerName := gofakeit.Username()
 	var freq int64 = 1
 	var secs int64 = 10
 	var delay int64 = 5
@@ -87,7 +87,7 @@ func TestStartTimer_OkWithReconnect(t *testing.T) {
 func TestStartTimer_OkWithDifferentClients(t *testing.T) {
 	_, s := suits.NewDefault(t)
 
-	timerName := gofakeit.Word()
+	timerName := gofakeit.Username()
 	var secs int64 = 10
 	// Every client has it's own frequency value
 	// That means they receive updates independently
