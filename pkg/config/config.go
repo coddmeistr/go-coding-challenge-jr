@@ -2,8 +2,8 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
@@ -33,7 +33,7 @@ func MustLoadByPath(path string) *ServerConfig {
 	// If file not exists, then display warning and continue program
 	envPath := "./.env"
 	if _, err := os.Stat(envPath); errors.Is(err, os.ErrNotExist) {
-		fmt.Printf(".env file was not found in %s\n", envPath)
+		log.Printf(".env file was not found in %s\n", envPath)
 	} else {
 		if err = ReadAndParseFromFile(envPath, &c); err != nil {
 			panic(err)

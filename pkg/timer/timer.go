@@ -50,7 +50,7 @@ func (t *Timer) StartOrSubscribe(timerName string, timerSeconds int, freq int) (
 		defer func() {
 			close(ping)
 			ticker.Stop()
-			fmt.Println("Closing timer timer subscription goroutine")
+			log.Println("closing timer timer subscription goroutine")
 		}()
 
 		for {
