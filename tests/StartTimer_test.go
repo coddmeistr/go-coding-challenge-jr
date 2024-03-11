@@ -91,8 +91,10 @@ func TestStartTimer_OkWithDifferentClients(t *testing.T) {
 	var secs int64 = 10
 	// Every client has it's own frequency value
 	// That means they receive updates independently
+	// UPDATE: this logic deprecated, now frequency binds once
+	// on timer creation
 	var freq1 int64 = 1
-	var freq2 int64 = 3
+	var freq2 int64 = 1
 
 	// Start first connection, with the first client
 	c1, err := s.Client.StartTimer(context.Background(), &proto.Timer{Name: timerName, Seconds: secs, Frequency: freq1})
