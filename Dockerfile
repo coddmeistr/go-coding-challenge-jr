@@ -10,9 +10,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build -C ./cmd/server -o ./build
 
 FROM scratch
 WORKDIR /app
+# Load ssl certs from previous image
 COPY --from=gobuild ./etc/ssl/certs ../etc/ssl/certs
 COPY --from=gobuild ./usr/share/ca-certificates ../usr/share/ca-certificates
+# Application configs
 COPY --from=gobuild ./app/configs ./configs
+# BUilded file
 COPY --from=gobuild ./app/cmd/server/build .
 
 EXPOSE $PORT
