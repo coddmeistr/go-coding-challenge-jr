@@ -50,13 +50,16 @@ func TestStartTimer_OkWithReconnect(t *testing.T) {
 	var secs int64 = 10
 	var delay int64 = 5
 
+	ctx, cancel := context.WithCancel(context.Background())
 	// Start first connection, which will create our timer
-	c, err := s.Client.StartTimer(context.Background(), &proto.Timer{Name: timerName, Seconds: secs, Frequency: freq})
+	c, err := s.Client.StartTimer(ctx, &proto.Timer{Name: timerName, Seconds: secs, Frequency: freq})
 	require.NoError(t, err)
 
-	// Immediately close connection, timer must keep running
-	err = c.CloseSend()
-	require.NoError(t, err)
+	// wait a bit to let server create new timer
+	time.Sleep(time.Duration(200) * time.Millisecond)
+
+	// close connection, timer must keep running
+	cancel()
 
 	// Wait specific amount of time
 	time.Sleep(time.Duration(delay) * time.Second)
