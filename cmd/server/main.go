@@ -39,7 +39,7 @@ func main() {
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 
 	sig := <-stop
-	log.Printf("Starting gracefull shutdown. Signal: %v\n", sig)
+	log.Printf("starting gracefull shutdown. Signal: %v\n", sig)
 	server.GracefulStop()
 
 	log.Println("gracefully stopped")
