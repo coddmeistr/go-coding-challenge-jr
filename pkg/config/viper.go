@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
@@ -31,11 +32,11 @@ func ReadAndParseFromFile(configFile string, dest any) error {
 func LoadEnvs(path string) {
 	viper.AutomaticEnv()
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		fmt.Printf("file with envs was not found in %s\n", path)
+		log.Printf("file with envs was not found in %s\n", path)
 		return
 	}
 	err := ReadAndParseFromFile(path, nil)
 	if err != nil {
-		fmt.Printf("couldn't load envs from file in: %s, err: %v", path, err)
+		log.Printf("couldn't load envs from file in: %s, err: %v", path, err)
 	}
 }

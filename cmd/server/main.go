@@ -8,6 +8,7 @@ import (
 	"challenge/pkg/timer"
 	"fmt"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -38,10 +39,10 @@ func main() {
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 
 	sig := <-stop
-	fmt.Printf("Starting gracefull shutdown. Signal: %v\n", sig)
+	log.Printf("Starting gracefull shutdown. Signal: %v\n", sig)
 	server.GracefulStop()
 
-	fmt.Println("Gracefully stopped")
+	log.Println("gracefully stopped")
 }
 
 func mustRun(server *grpc.Server, port int) {
@@ -50,7 +51,7 @@ func mustRun(server *grpc.Server, port int) {
 		panic(err)
 	}
 
-	fmt.Printf("Starting gRPC server on port :%d\n", port)
+	log.Printf("starting gRPC server on port :%d\n", port)
 	if err := server.Serve(l); err != nil {
 		panic(err)
 	}

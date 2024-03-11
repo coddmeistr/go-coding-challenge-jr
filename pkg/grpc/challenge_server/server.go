@@ -4,7 +4,6 @@ import (
 	"challenge/pkg/proto"
 	"challenge/pkg/timer"
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -50,12 +49,13 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 	}
 	defer func() {
 		cancel()
-		fmt.Println("Ending streaming grpc method")
+		log.Println("ending streaming grpc method")
 	}()
 
 	for {
 		select {
 		case <-stream.Context().Done():
+			log.Println("connection was closed from client side")
 			return nil
 		case info, ok := <-ping:
 			if !ok {
@@ -79,13 +79,16 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 func (s *server) ReadMetadata(ctx context.Context, _ *proto.Placeholder) (*proto.Placeholder, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
+		log.Println("failed to get metadata from context")
 		return nil, status.Errorf(codes.DataLoss, "Failed to get metadata")
 	}
 	mds, ok := md[metadataKey]
 	if !ok {
+		log.Println("metadata not exists")
 		return nil, status.Errorf(codes.NotFound, "String metadata not found")
 	}
 	if len(mds) == 0 {
+		log.Println("metadata len is 0")
 		return nil, status.Errorf(codes.NotFound, "String metadata found but empty")
 	}
 
