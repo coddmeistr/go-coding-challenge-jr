@@ -1,8 +1,10 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/viper"
+	"os"
 )
 
 // ReadAndParseFromFile takes config file and loads this config file in viper
@@ -20,4 +22,20 @@ func ReadAndParseFromFile(configFile string, dest any) error {
 	}
 
 	return nil
+}
+
+// LoadEnvs helper functions that loads envs in viper with viper.AutomaticEnv
+// and loads envs from given file from given path.
+//
+// If file not exists or some error occurred, then it prints warning message.
+func LoadEnvs(path string) {
+	viper.AutomaticEnv()
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		fmt.Printf("file with envs was not found in %s\n", path)
+		return
+	}
+	err := ReadAndParseFromFile(path, nil)
+	if err != nil {
+		fmt.Printf("couldn't load envs from file in: %s, err: %v", path, err)
+	}
 }

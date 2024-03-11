@@ -15,9 +15,11 @@ import (
 	"syscall"
 )
 
+const defaultConfigPath = "./configs/server.yaml"
+
 func main() {
 	// Init config
-	cfg := config.MustLoadByPath("./configs/server.yaml")
+	cfg := config.MustLoadByPath(defaultConfigPath)
 
 	// Init and inject all dependencies
 	bil := bilty.NewBilty(cfg.BitlyOAuthToken, http.DefaultClient)

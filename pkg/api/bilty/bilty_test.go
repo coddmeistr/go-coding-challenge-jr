@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"challenge/pkg/config"
 	"encoding/json"
-	"fmt"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -90,12 +89,8 @@ func TestCreateShortLink_TestCases(t *testing.T) {
 // API test
 func TestBitly_TestCases(t *testing.T) {
 
-	// Load environment variables in viper from context and from file
-	viper.AutomaticEnv()
-	envPath := "../../../.env"
-	if err := config.ReadAndParseFromFile(envPath, nil); err != nil {
-		fmt.Printf(".env file was not found in %s\n", envPath)
-	}
+	// Load environment variables
+	config.LoadEnvs("../../../.env")
 	token := viper.GetString("BITLY_OAUTH_TOKEN")
 	require.NotEqual(t, "", token)
 
