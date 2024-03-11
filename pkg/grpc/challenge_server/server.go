@@ -44,6 +44,7 @@ func (s *server) MakeShortLink(_ context.Context, in *proto.Link) (*proto.Link, 
 
 func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_StartTimerServer) error {
 
+	// Preventing parallel calls to api. May lead to errors with simultaneous calls
 	s.mu.Lock()
 	ping, err := s.timer.Subscribe(timer.GetName(), int(timer.GetSeconds()), int(timer.GetFrequency()))
 	if err != nil {
@@ -51,6 +52,7 @@ func (s *server) StartTimer(timer *proto.Timer, stream proto.ChallengeService_St
 		return status.Error(codes.Internal, "Couldn't start or subscribe to timer")
 	}
 	s.mu.Unlock()
+
 	defer func() {
 		s.timer.Unsubscribe(timer.GetName(), ping)
 		log.Println("ending streaming grpc method")
