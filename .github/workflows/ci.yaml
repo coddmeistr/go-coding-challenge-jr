@@ -7,9 +7,8 @@ on:
       - main
 
 env:
-  REGISTRY: "ghcr.io/maxik12233/"
-  IMAGE_NAME: "grpc-server-image"
-  PORT: "6000"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build_and_push:
@@ -18,27 +17,29 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v2
 
-      - name: Build container image
-        run: docker build --build-arg PORT=$PORT -t $(echo $REGISTRY)$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) ./
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Run docker container
-        run: docker run -e BITLY_OAUTH_TOKEN=${{secrets.BITLY_OAUTH_TOKEN}} -p $(echo $PORT):$(echo $PORT) -d $(echo $REGISTRY)$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
-
-      - name: Unit and integration tests
-        run: |
-          go test ./...
-        env:
-          GRPC_HOST_PORT: localhost:${{env.PORT}}
-          BITLY_OAUTH_TOKEN: ${{secrets.BITLY_OAUTH_TOKEN}}
-
-      - name: Registry login
+      - name: Login to registry
         uses: docker/login-action@v1
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push
-        run: docker push $(echo $REGISTRY)$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5.1.0
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            "PORT=${{ env.PORT }}"
+
 
 
